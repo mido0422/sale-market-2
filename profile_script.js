@@ -82,12 +82,16 @@ function loadUserProfile() {
     document.getElementById('profileName').textContent = currentUser.name || 'Хэрэглэгч';
     document.getElementById('profileEmail').textContent = currentUser.email || '';
     
-    // Load profile photo if exists
-    if (currentUser.profilePhoto) {
+    // Load profile photo if exists (check both 'profilePhoto' and 'photo' keys)
+    const photoUrl = currentUser.profilePhoto || currentUser.photo;
+    if (photoUrl) {
         const profilePhotoElement = document.getElementById('profilePhoto');
         if (profilePhotoElement) {
-            profilePhotoElement.src = currentUser.profilePhoto;
+            profilePhotoElement.src = photoUrl;
+            console.log('Profile photo loaded:', photoUrl.substring(0, 50) + '...');
         }
+    } else {
+        console.log('No profile photo found for user');
     }
 
     // Populate form fields
@@ -203,17 +207,28 @@ function changeProfilePhoto() {
                 // Save to localStorage
                 const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
                 currentUser.profilePhoto = imageData;
+                currentUser.photo = imageData; // Also save as 'photo' for compatibility
                 
                 // Save to both storage keys
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 localStorage.setItem('japanUser', JSON.stringify(currentUser));
                 
-                // Update users array
+                // Update users array (old key for compatibility)
                 let users = JSON.parse(localStorage.getItem('users')) || [];
                 const userIndex = users.findIndex(u => u.email === currentUser.email);
                 if (userIndex !== -1) {
                     users[userIndex] = currentUser;
                     localStorage.setItem('users', JSON.stringify(users));
+                }
+                
+                // Update japanUsers array (main users database)
+                let japanUsers = JSON.parse(localStorage.getItem('japanUsers')) || [];
+                const japanUserIndex = japanUsers.findIndex(u => u.email === currentUser.email);
+                if (japanUserIndex !== -1) {
+                    japanUsers[japanUserIndex].profilePhoto = imageData;
+                    japanUsers[japanUserIndex].photo = imageData;
+                    localStorage.setItem('japanUsers', JSON.stringify(japanUsers));
+                    console.log('Profile photo saved to japanUsers');
                 }
                 
                 showToast('success', '✅ Профайл зураг амжилттай солигдлоо!');
