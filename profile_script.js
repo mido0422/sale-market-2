@@ -45,34 +45,14 @@ function loadUserProfile() {
         currentUser = JSON.parse(localStorage.getItem('japanUser'));
     }
     
-    // If still no user, create demo user for testing
+    // If still no user, redirect to login page
     if (!currentUser) {
-        currentUser = {
-            id: 1,
-            name: 'Болд Б.',
-            email: 'bold@email.com',
-            phone: '+976 9999-9999',
-            birthdate: '1990-01-01',
-            city: 'Улаанбаатар',
-            district: 'Сүхбаатар',
-            address: '3-р хороо, 15-р байр',
-            address2: '',
-            interests: [],
-            savedAddresses: [
-                {
-                    name: 'Болд Б.',
-                    phone: '+976 9999-9999',
-                    city: 'Улаанбаатар',
-                    district: 'Сүхбаатар',
-                    address: '3-р хороо, 15-р байр',
-                    type: 'Гэр',
-                    isDefault: true
-                }
-            ]
-        };
-        // Save demo user
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        localStorage.setItem('japanUser', JSON.stringify(currentUser));
+        console.log('No user found, redirecting to login...');
+        showToast('warning', '⚠️ Нэвтрэх шаардлагатай!');
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 1500);
+        return;
     }
 
     // Populate header
@@ -143,15 +123,33 @@ function saveProfile(e) {
         ...formData,
         // Preserve these fields
         id: currentUser.id,
+        password: currentUser.password, // Keep password
         profilePhoto: currentUser.profilePhoto,
-        savedAddresses: currentUser.savedAddresses || []
+        photo: currentUser.photo,
+        savedAddresses: currentUser.savedAddresses || [],
+        orderHistory: currentUser.orderHistory || [],
+        wishlist: currentUser.wishlist || [],
+        createdAt: currentUser.createdAt
     };
 
     // Save to localStorage - both currentUser and japanUser
     localStorage.setItem('currentUser', JSON.stringify(updatedUser));
     localStorage.setItem('japanUser', JSON.stringify(updatedUser));
 
-    // Update all users array
+    // Update japanUsers array (main database)
+    let japanUsers = JSON.parse(localStorage.getItem('japanUsers')) || [];
+    const japanUserIndex = japanUsers.findIndex(u => u.email === updatedUser.email);
+    if (japanUserIndex !== -1) {
+        japanUsers[japanUserIndex] = updatedUser;
+        localStorage.setItem('japanUsers', JSON.stringify(japanUsers));
+        console.log('User updated in japanUsers database');
+    } else {
+        console.warn('User not found in japanUsers, adding...');
+        japanUsers.push(updatedUser);
+        localStorage.setItem('japanUsers', JSON.stringify(japanUsers));
+    }
+
+    // Update old users array for compatibility
     let users = JSON.parse(localStorage.getItem('users')) || [];
     const userIndex = users.findIndex(u => u.email === updatedUser.email);
     if (userIndex !== -1) {

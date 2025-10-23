@@ -695,6 +695,16 @@
                 phone: phone,
                 password: password,
                 photo: 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=667eea&color=fff',
+                profilePhoto: 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=667eea&color=fff',
+                birthdate: '',
+                city: '',
+                district: '',
+                address: '',
+                address2: '',
+                interests: [],
+                savedAddresses: [],
+                orderHistory: [],
+                wishlist: [],
                 createdAt: new Date().toISOString()
             };
             
@@ -703,6 +713,9 @@
             localStorage.setItem('japanUsers', JSON.stringify(users));
             localStorage.setItem('japanUser', JSON.stringify(newUser));
             localStorage.setItem('currentUser', JSON.stringify(newUser));
+            
+            console.log('New user registered:', newUser);
+            console.log('Total users:', users.length);
             
             showToast('success', '🎉 Амжилттай бүртгэгдлээ!');
             
