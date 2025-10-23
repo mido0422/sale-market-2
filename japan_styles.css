@@ -7494,20 +7494,68 @@ input:checked + .slider:before {
         padding: 1rem;
     }
 
+    .product-category {
+        font-size: 0.7rem;
+    }
+
     .product-name {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
         word-spacing: 0.1em;
         line-height: 1.3;
     }
 
+    .product-name-jp {
+        font-size: 0.7rem;
+    }
+
+    .product-rating {
+        margin-bottom: 0.5rem;
+    }
+
+    .stars {
+        font-size: 0.7rem;
+    }
+
+    .review-count {
+        font-size: 0.65rem;
+    }
+
     .product-price {
-        font-size: 1.1rem;
+        font-size: 0.95rem;
         word-spacing: 0.08em;
     }
 
+    .price-tugrik {
+        font-size: 1.1rem !important;
+    }
+
+    .price-yen {
+        font-size: 0.75rem !important;
+    }
+
     .old-price {
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         word-spacing: 0.08em;
+    }
+
+    .discount-badge {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.4rem;
+    }
+
+    .product-actions button {
+        font-size: 0.7rem;
+        padding: 0.5rem 0.3rem;
+        white-space: normal;
+        line-height: 1.2;
+    }
+
+    .view-details,
+    .add-to-cart,
+    .buy-now-btn,
+    .write-review-btn {
+        font-size: 0.7rem !important;
+        padding: 0.5rem 0.4rem !important;
     }
 
     .modal-content {
