@@ -424,6 +424,24 @@ let currentUser = JSON.parse(localStorage.getItem('japanUser')) || null;
 let userOrders = JSON.parse(localStorage.getItem('japanOrders')) || [];
 let uploadedImages = []; // Store uploaded image data URLs
 
+// Reload cart from localStorage on page load
+function reloadCart() {
+    try {
+        const savedCart = localStorage.getItem('japanCart');
+        if (savedCart) {
+            cart = JSON.parse(savedCart);
+            console.log('Cart loaded from localStorage:', cart);
+        } else {
+            cart = [];
+            console.log('No cart found in localStorage, starting with empty cart');
+        }
+        updateCartCount();
+    } catch (error) {
+        console.error('Error loading cart:', error);
+        cart = [];
+    }
+}
+
 // Admin credentials (In production, this should be server-side!)
 const ADMIN_EMAILS = [
     'admin@japanmarket.mn', 
@@ -436,6 +454,9 @@ let isAdmin = false;
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize EmailJS
     emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your EmailJS public key
+    
+    // Reload cart from localStorage first
+    reloadCart();
     
     loadProducts();
     updateCartCount();
@@ -629,15 +650,21 @@ function updateWishlistCount() {
 
 // Cart Functions
 function addToCart(productId) {
+    console.log('Adding to cart, product ID:', productId);
     const product = productsData.find(p => p.id === productId);
-    if (!product) return;
+    if (!product) {
+        console.error('Product not found:', productId);
+        showToast('error', '❌ Бараа олдсонгүй!');
+        return;
+    }
     
     const existingItem = cart.find(item => item.id === productId);
     
     if (existingItem) {
         existingItem.quantity++;
+        console.log('Increased quantity for existing item:', existingItem);
     } else {
-        cart.push({
+        const newItem = {
             id: product.id,
             name: product.name,
             name_jp: product.name_jp,
@@ -645,12 +672,15 @@ function addToCart(productId) {
             price_yen: product.price_yen,
             image: product.images[0],
             quantity: 1
-        });
+        };
+        cart.push(newItem);
+        console.log('Added new item to cart:', newItem);
     }
     
     localStorage.setItem('japanCart', JSON.stringify(cart));
+    console.log('Cart saved to localStorage:', cart);
     updateCartCount();
-    showNotification('🛒 Сагсанд нэмсэн!');
+    showToast('success', '✅ Сагсанд нэмэгдлээ! (' + product.name + ')');
 }
 
 function buyNow(productId) {
@@ -712,22 +742,30 @@ const currencySymbols = {
 };
 
 function openCartModal() {
+    // Reload cart from localStorage to ensure we have latest data
+    reloadCart();
+    
     console.log('Cart Modal Opening...', cart);
+    console.log('Cart length:', cart.length);
+    
     const modal = document.getElementById('cartModal');
     const cartItemsContainer = document.getElementById('cartItems');
     
     if (!modal) {
         console.error('Cart modal element not found!');
+        showToast('error', '❌ Сагсны цонх олдсонгүй!');
         return;
     }
     
     if (!cartItemsContainer) {
         console.error('Cart items container not found!');
+        showToast('error', '❌ Сагсны элемент олдсонгүй!');
         return;
     }
     
     if (cart.length === 0) {
-        cartItemsContainer.innerHTML = '<p class="empty-cart">Таны сагс хоосон байна</p>';
+        console.log('Cart is empty, showing empty message');
+        cartItemsContainer.innerHTML = '<p class="empty-cart">🛒 Таны сагс хоосон байна</p>';
         document.getElementById('promoSection').style.display = 'none';
         document.getElementById('deliverySection').style.display = 'none';
         document.getElementById('addressSection').style.display = 'none';
@@ -737,6 +775,7 @@ function openCartModal() {
         document.getElementById('cartActions').style.display = 'none';
         document.getElementById('cartRecommendations').style.display = 'none';
     } else {
+        console.log('Cart has items, rendering:', cart.length, 'items');
         cartItemsContainer.innerHTML = cart.map(item => {
             const product = productsData.find(p => p.id === item.id);
             const stockWarning = product && product.stock < 5 ? 'low' : '';
