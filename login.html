@@ -633,8 +633,17 @@
                 // Save to localStorage
                 localStorage.setItem('japanUser', JSON.stringify(user));
                 localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // Handle Remember Me
                 if (rememberMe) {
                     localStorage.setItem('japanRememberMe', 'true');
+                    localStorage.setItem('japanRememberedEmail', email);
+                    localStorage.setItem('japanRememberedPassword', password);
+                } else {
+                    // Clear saved credentials if unchecked
+                    localStorage.removeItem('japanRememberMe');
+                    localStorage.removeItem('japanRememberedEmail');
+                    localStorage.removeItem('japanRememberedPassword');
                 }
                 
                 showToast('success', '🎉 Амжилттай нэвтэрлээ!');
@@ -714,6 +723,17 @@
             if (user) {
                 // Already logged in, redirect to home
                 window.location.href = 'index.html';
+            }
+
+            // Load saved credentials if "Remember Me" was checked
+            const rememberedEmail = localStorage.getItem('japanRememberedEmail');
+            const rememberedPassword = localStorage.getItem('japanRememberedPassword');
+            const rememberMeChecked = localStorage.getItem('japanRememberMe') === 'true';
+
+            if (rememberedEmail && rememberedPassword && rememberMeChecked) {
+                document.getElementById('loginEmail').value = rememberedEmail;
+                document.getElementById('loginPassword').value = rememberedPassword;
+                document.getElementById('rememberMe').checked = true;
             }
         });
     </script>

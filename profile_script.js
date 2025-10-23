@@ -14,10 +14,18 @@ function logout() {
         confirmText: 'Тийм, гарах',
         cancelText: 'Үгүй',
         onConfirm: () => {
+            // Remove user session but keep remember me settings if checked
             localStorage.removeItem('currentUser');
+            localStorage.removeItem('japanUser');
+            
+            // Don't remove remember me data - it should persist
+            // localStorage.removeItem('japanRememberMe');
+            // localStorage.removeItem('japanRememberedEmail');
+            // localStorage.removeItem('japanRememberedPassword');
+            
             showToast('success', '✅ Амжилттай гарлаа!');
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = 'login.html';
             }, 1500);
         }
     });
